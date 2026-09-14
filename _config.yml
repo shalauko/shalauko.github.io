@@ -1,0 +1,44 @@
+title: Stan Halauko
+tagline: Embedded Software Engineer
+description: >-
+  Embedded software engineering — UWB, real-time localization, firmware
+  and the low-level protocol work underneath it.
+url: https://halauko.eu
+lang: en
+
+author:
+  name: Stan Halauko
+  email: stan@halauko.eu
+
+social_links:
+  github: shalauko
+  linkedin: shalauko
+
+
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+
+kramdown:
+  math_engine: mathjax
+  syntax_highlighter: rouge
+  footnote_nr: 1
+
+# MathJax version used when a post sets `math: true`
+mathjax_version: "3.2.2"
+
+# Article notes arrive from the vault without a `layout:` key. They are pages
+# (not posts) so that their assets can sit in the same folder -- Jekyll excludes
+# every _-prefixed directory from the output, so `_posts` could never hold them.
+defaults:
+  - scope: { path: "articles" }
+    values:
+      layout: post
+
+exclude:
+  - README.md
+  - preview
+  - vendor
+  - Gemfile
+  - Gemfile.lock

@@ -1,0 +1,471 @@
+/* ---- tokens ------------------------------------------------------------- */
+
+:root {
+  --bg:        #fdfdfc;
+  --fg:        #1b1b19;
+  --muted:     #6d6d66;
+  /* One blue (hue ~212deg) in three roles: text, solid fill, and the colour
+     that sits on top of that fill. */
+  /* the single dark base the whole homepage sits on */
+  --monolith:    #0d1420;
+
+  --accent:      #123a6b;
+  --accent-fill: #123a6b;
+  --accent-on:   #ffffff;
+  --rule:      #e4e3de;
+  --code-bg:   #f4f3f0;
+  --figure-bg: #ffffff;
+
+  --measure: 68ch;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+          Arial, "Noto Sans", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+          "Liberation Mono", monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:      #121211;
+    --fg:      #e7e6e1;
+    --muted:   #9b9b93;
+    /* same hue, lifted: #123a6b as text would be unreadable on a dark page */
+    --accent:      #79a5d8;
+    --accent-fill: #1a4d85;
+    --accent-on:   #ffffff;
+    --rule:    #2a2a27;
+    --code-bg: #1c1c1a;
+    /* diagrams ship with a baked-in white background, so they are presented
+       as light figure cards in both themes rather than glowing white blocks */
+    --figure-bg: #f7f7f4;
+  }
+}
+
+/* ---- base -------------------------------------------------------------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a:hover { text-decoration-thickness: 2px; }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.skip-link {
+  position: absolute; left: -9999px;
+  background: var(--bg); color: var(--fg);
+  padding: .6rem 1rem; border: 1px solid var(--rule);
+}
+.skip-link:focus { left: 1rem; top: 1rem; z-index: 10; }
+
+/* ---- shell ------------------------------------------------------------- */
+
+.wrap { max-width: var(--measure); margin-inline: auto; padding-inline: 1.25rem; }
+
+/* Text for screen readers only -- the icon links carry their label this way. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* The dark "board" surface: monolith colour + PCB texture. Shared by the
+   blog list on the homepage and by full article pages, so both read as one site.
+   It pins its own tokens because it is dark whatever the visitor's scheme. */
+.board {
+  position: relative;
+  isolation: isolate;
+  background-color: var(--monolith);
+
+  --fg: #e9edf3;
+  --muted: #94a3b7;
+  --rule: #223148;
+  --accent: #8fb8e6;
+  --code-bg: #16202f;
+  --figure-bg: #f7f7f4;
+  color: var(--fg);
+}
+
+.board::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url("img/circuit.svg");
+  background-size: 720px 720px;
+  background-repeat: repeat;
+  opacity: .20;
+  pointer-events: none;
+}
+
+/* Scrim across the reading column only, so the texture stays visible in the
+   margins but never sits directly under body text. Horizontal (not radial)
+   because an article page can be many screens tall. */
+.board::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(to right,
+      rgba(13, 20, 32, 0) 0%,
+      rgba(13, 20, 32, .88) 22%,
+      rgba(13, 20, 32, .88) 78%,
+      rgba(13, 20, 32, 0) 100%);
+}
+
+/* blog list on the homepage: fade the texture in from the hero above */
+.blog { padding-block: 4rem 5rem; }
+.blog::before {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 9rem);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 9rem);
+}
+
+/* full article pages */
+.article-page { padding-block: 0 3rem; }
+
+/* Both page types are one dark surface top to bottom; stops overscroll from
+   flashing the light page colour. */
+body.home, body.post { background: var(--monolith); }
+
+/* ---- hero (first screen) ----------------------------------------------- */
+
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem 6rem;
+
+  --fg: #f4f6f9;
+  --muted: #c2cede;
+  --rule: rgba(244, 246, 249, .45);
+  --accent: #9dc4ee;
+  color: var(--fg);
+
+  background-color: var(--monolith);
+  background-image:
+    /* 1. bottom fade -- dissolves the seam into the articles section */
+    linear-gradient(to bottom, rgba(13, 20, 32, 0) 52%, var(--monolith) 100%),
+    /* 2. left-to-right fade -- portrait dissolves into the flat colour */
+    linear-gradient(to right,
+        rgba(13, 20, 32, .08) 0%,
+        rgba(13, 20, 32, .26) 14%,
+        rgba(13, 20, 32, .70) 26%,
+        rgba(13, 20, 32, .94) 36%,
+        var(--monolith) 44%),
+    /* 3. the portrait itself, pinned left and full height, so a narrowing
+          viewport crops it from the right rather than shrinking it */
+    url("img/portrait.svg");
+  background-size: 100% 100%, 100% 100%, auto 100%;
+  background-position: center, center, left center;
+  background-repeat: no-repeat;
+}
+
+/* wide: the portrait owns the left, content sits over the flat right */
+/* narrow: no room for both -- drop the portrait and fall back to the same
+   board texture the articles use, so the two halves stay coherent */
+@media (max-width: 67.99rem) {
+  .hero {
+    background-image:
+      linear-gradient(to bottom, rgba(13, 20, 32, .86) 0%, var(--monolith) 92%),
+      url("img/circuit.svg");
+    background-size: 100% 100%, 720px 720px;
+    background-position: center, center top;
+    background-repeat: no-repeat, repeat;
+  }
+}
+
+.hero-inner { max-width: 34rem; text-align: center; }
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(2.5rem, 9vw, 4.25rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.hero-role {
+  margin: .5rem 0 0;
+  color: var(--muted);
+  font-size: clamp(1rem, 2.5vw, 1.1875rem);
+}
+
+.hero-blurb { margin-top: 1.75rem; color: var(--muted); }
+.hero-blurb p { margin: 0; }
+
+.hero-icons {
+  margin-top: 2.75rem;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.125rem;
+}
+.hero-icons a {
+  display: grid;
+  place-items: center;
+  width: 3.75rem;
+  height: 3.75rem;
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  color: var(--fg);
+  transition: background-color .18s ease, border-color .18s ease, color .18s ease;
+}
+.hero-icons a:hover,
+.hero-icons a:focus-visible {
+  background: var(--accent-fill);
+  /* the lighter tint, not the fill: in dark mode a dark-blue circle on a
+     near-black page has no visible edge without it */
+  border-color: var(--accent);
+  color: var(--accent-on);
+}
+.hero-icons svg { width: 1.5rem; height: 1.5rem; }
+
+/* four icons must still fit one row on a narrow phone */
+@media (max-width: 26rem) {
+  .hero-icons { gap: .75rem; }
+  .hero-icons a { width: 3.25rem; height: 3.25rem; }
+  .hero-icons svg { width: 1.3rem; height: 1.3rem; }
+}
+
+/* ---- section heading --------------------------------------------------- */
+
+.section-head {
+  scroll-margin-top: 2rem;
+  margin: 0 0 2.5rem;
+  padding-bottom: .5rem;
+  border-bottom: 1px solid var(--rule);
+  font-size: .8125rem;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---- timeline of articles ---------------------------------------------- */
+
+.timeline { list-style: none; margin: 0 0 2rem; padding: 0; }
+
+.entry {
+  position: relative;
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  gap: 1.75rem;
+  padding-bottom: 3.5rem;
+}
+
+/* the spine, drawn behind the thumbnails */
+.entry::before {
+  content: "";
+  position: absolute;
+  left: 2.75rem;
+  top: 5.5rem;
+  bottom: 0;
+  width: 1px;
+  background: var(--rule);
+}
+.entry:last-child::before { display: none; }
+
+.entry-thumb {
+  position: relative;
+  z-index: 1;
+  width: 5.5rem;
+  height: 5.5rem;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: var(--figure-bg);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+.entry-thumb img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  padding: .35rem;
+}
+
+/* articles with no diagram get a via marker on the board background */
+.entry-thumb-empty {
+  background: transparent;
+  border-style: dashed;
+  color: var(--muted);
+}
+.entry-thumb-empty svg { width: 1.75rem; height: 1.75rem; opacity: .7; }
+
+/* the "coming soon" stand-in: same shape as a real entry, visibly inert */
+.entry-placeholder { padding-bottom: 1rem; }
+.entry-placeholder .entry-title { color: var(--muted); font-weight: 600; }
+.entry-placeholder .entry-meta {
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  opacity: .75;
+}
+
+.entry-meta {
+  margin: 0 0 .4rem;
+  font-family: var(--mono);
+  font-size: .8125rem;
+  letter-spacing: .02em;
+  color: var(--muted);
+}
+.entry-meta .sep { margin-inline: .5rem; }
+
+.entry-title { margin: 0; font-size: clamp(1.25rem, 3vw, 1.625rem); line-height: 1.25; }
+.entry-title a { color: var(--fg); text-decoration: none; }
+.entry-title a:hover { color: var(--accent); text-decoration: underline; }
+
+.entry-excerpt { margin: .6rem 0 0; color: var(--muted); }
+.entry-more { margin: 1rem 0 0; font-size: .9375rem; }
+.entry-more a { text-decoration: none; font-weight: 600; }
+.entry-more a:hover { text-decoration: underline; }
+
+.empty { color: var(--muted); padding-block: 2rem; }
+
+/* stack on narrow screens; spine and thumbnail step aside */
+@media (max-width: 34rem) {
+  .entry { grid-template-columns: 1fr; gap: 1rem; padding-bottom: 2.75rem; }
+  .entry::before { display: none; }
+  .entry-thumb { width: 100%; height: 8rem; }
+}
+
+@media (max-height: 34rem) {
+  .hero { min-height: auto; padding-block: 4rem; }
+}
+
+/* ---- post -------------------------------------------------------------- */
+
+.breadcrumb { margin-block: 2rem .5rem; font-size: .9375rem; }
+.breadcrumb a { text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb-end { margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); }
+
+.post-header { margin-bottom: 2.5rem; }
+.post-meta {
+  margin: .5rem 0 0;
+  font-family: var(--mono);
+  font-size: .8125rem;
+  letter-spacing: .02em;
+  color: var(--muted);
+}
+.post-meta .sep { margin-inline: .5rem; }
+.post-header h1 {
+  margin: 0;
+  font-size: clamp(1.75rem, 5vw, 2.25rem);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+
+.post h2 { margin: 2.75rem 0 .75rem; font-size: 1.4rem; line-height: 1.3; }
+.post h3 { margin: 2rem 0 .5rem;    font-size: 1.15rem; line-height: 1.35; }
+.post h4 { margin: 1.75rem 0 .5rem; font-size: 1rem; color: var(--muted); }
+.post p, .post ul, .post ol { margin-block: 1rem; }
+.post li + li { margin-top: .35rem; }
+
+.post blockquote {
+  margin: 1.5rem 0;
+  padding: .25rem 0 .25rem 1.25rem;
+  border-left: 2px solid var(--rule);
+  color: var(--muted);
+}
+.post blockquote p { margin-block: .5rem; }
+
+.post hr { margin: 2.5rem 0; border: 0; border-top: 1px solid var(--rule); }
+
+/* ---- figures ----------------------------------------------------------- */
+
+/* The SVG diagrams (drawio + PlantUML) have a white background baked in.
+   Presenting them on a light card keeps them legible in dark mode. */
+.post img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1.75rem auto;
+  background: var(--figure-bg);
+  padding: 1rem;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+}
+
+/* ---- code -------------------------------------------------------------- */
+
+.post code {
+  font-family: var(--mono);
+  font-size: .9em;
+  background: var(--code-bg);
+  padding: .15em .35em;
+  border-radius: 3px;
+}
+.post pre {
+  background: var(--code-bg);
+  padding: 1rem;
+  border-radius: 3px;
+  overflow-x: auto;
+}
+.post pre code { background: none; padding: 0; font-size: .875rem; }
+
+/* ---- tables ------------------------------------------------------------ */
+
+.post .table-scroll { overflow-x: auto; margin-block: 1.5rem; }
+.post table { border-collapse: collapse; width: 100%; font-size: .9375rem; }
+.post th, .post td { padding: .5rem .75rem; border-bottom: 1px solid var(--rule); text-align: left; }
+.post th { font-weight: 600; }
+
+/* ---- math -------------------------------------------------------------- */
+
+/* long display equations scroll rather than widen the page */
+mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; padding-block: .35rem; }
+
+/* before MathJax runs, keep raw TeX from looking like body prose */
+.post .katex-fallback { font-family: var(--mono); color: var(--muted); }
+
+/* ---- footnotes --------------------------------------------------------- */
+
+.post .footnotes {
+  margin-top: 3rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--rule);
+  font-size: .9375rem;
+  color: var(--muted);
+}
+.post a.footnote { text-decoration: none; }
+
+/* ---- footer ------------------------------------------------------------ */
+
+.site-footer {
+  background: var(--monolith);
+  color: #94a3b7;
+  border-top: 1px solid #223148;
+  padding: 1.5rem 1.25rem 3rem;
+  font-size: .875rem;
+}
+.site-footer-inner { max-width: var(--measure); margin-inline: auto; }
+.site-footer a { color: #8fb8e6; }
+.site-footer p { margin: 0; }
+
+/* ---- motion ------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}

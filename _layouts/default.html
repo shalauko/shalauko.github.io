@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: 'en' }}">
+<head>
+  {%- include head.html -%}
+</head>
+<body class="{{ page.layout }}">
+  <a class="skip-link" href="#main">Skip to content</a>
+  {{ content }}
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <p>&copy; {{ 'now' | date: '%Y' }} {{ site.author.name }}</p>
+    </div>
+  </footer>
+</body>
+</html>

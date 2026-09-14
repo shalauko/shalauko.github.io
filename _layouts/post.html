@@ -1,0 +1,25 @@
+---
+layout: default
+---
+<main id="main" class="board article-page">
+  <div class="wrap">
+  <p class="breadcrumb"><a href="{{ '/' | relative_url }}">&larr; {{ site.title }}</a></p>
+
+  <article class="post">
+    <header class="post-header">
+      <h1>{{ page.title }}</h1>
+      <p class="post-meta">
+        <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%-d %B %Y' }}</time>
+        {%- if page.tags and page.tags.size > 0 %}
+        <span class="sep" aria-hidden="true">&middot;</span>
+        <span class="tags">{{ page.tags | join: ', ' }}</span>
+        {%- endif %}
+      </p>
+    </header>
+
+    {{ content }}
+  </article>
+
+  <p class="breadcrumb breadcrumb-end"><a href="{{ '/#blog' | relative_url }}">&larr; Back to blog</a></p>
+  </div>
+</main>

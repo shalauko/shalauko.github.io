@@ -1,0 +1,48 @@
+#!/usr/bin/env ruby
+# Local preview: builds the site, watches for changes, serves it.
+#
+#   ./preview            -> http://127.0.0.1:4000
+#   ./preview 5000       -> pick another port
+#
+# Normally `bundle exec jekyll serve` is all you need. This script exists
+# because Jekyll's gemspec hard-depends on em-websocket (LiveReload only),
+# which needs a C extension -- and that cannot build without `ruby-dev`.
+# Serving does not actually use it, so we put the installed gems on the load
+# path directly and skip RubyGems' dependency activation.
+#
+# Once `sudo apt install ruby-dev` has been run, plain `jekyll serve` works
+# and this script is redundant.
+
+$stdout.sync = true
+
+require "rubygems"
+
+Gem.path.each do |root|
+  Dir["#{root}/gems/*/lib"].each { |d| $LOAD_PATH.unshift(d) }
+end
+
+require "jekyll"
+require "jekyll/commands/build"
+require "jekyll/commands/serve"
+
+port = (ARGV[0] || 4000).to_i
+root = File.expand_path(__dir__)
+
+config = Jekyll.configuration(
+  "source"      => root,
+  "destination" => File.join(root, "_site"),
+  "watch"       => true,
+  # jekyll-watch blocks in its own sleep loop unless it knows a server
+  # will block instead; without this the web server never starts.
+  "serving"     => true,
+  "livereload"  => false,
+  "host"        => "127.0.0.1",
+  "port"        => port,
+  "open_url"    => false
+)
+
+puts "Serving #{config["url"]} from #{config["destination"]}"
+puts "  -> http://127.0.0.1:#{port}   (Ctrl-C to stop)"
+
+Jekyll::Commands::Build.process(config)
+Jekyll::Commands::Serve.process(config)

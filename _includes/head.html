@@ -1,0 +1,25 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="{{ '/favicon.svg' | relative_url }}" type="image/svg+xml">
+
+{%- seo -%}
+
+<link rel="stylesheet" href="{{ '/assets/style.css' | relative_url }}">
+
+{%- if page.math %}
+<script>
+  window.MathJax = {
+    tex: {
+      /* kramdown emits \( \) inline and \[ \] for display; $$ kept as a
+         safety net. Bare $...$ is deliberately NOT enabled so prose like
+         "costs $5" is never mistaken for math. */
+      inlineMath: [['\\(', '\\)']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true
+    },
+    options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] }
+  };
+</script>
+<script id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@{{ site.mathjax_version }}/es5/tex-mml-chtml.js"></script>
+{%- endif %}
